@@ -1,16 +1,16 @@
-# Motion Sword
+# Minecraft Controller Sword
 
 <img src="images/sword_setup.jpg" alt="The finished foam sword with the breadboard taped on, in front of a laptop running Minecraft" width="500">
 
-A motion-controlled Minecraft sword built for StormHacks. Swing a real (foam) sword and your character attacks in Minecraft.
+A motion-controlled Minecraft sword using ESP32. You can swing, shield, rotate, jump and walk in Minecraft IRL.
 
-The sword pairs with your laptop as a **Bluetooth mouse**, so there are no Minecraft mods and nothing to install on the laptop. Every hard swing sends a left click.
+The sword pairs with your laptop with **Bluetooth**, so there is nothing to install on the laptop.
 
 | With the sword | Laptop sees | In Minecraft |
 | --- | --- | --- |
 | Swing hard | Left click | Attack |
 
-## What you need
+## Equitment
 
 - ESP32 dev board (30-pin, USB-C, CP2102)
 - MPU6050 (GY-521) accelerometer/gyro
@@ -43,11 +43,11 @@ Open the Serial Monitor at **115200 baud** to see `SWING DETECTED!` every time a
 
 ## the build process
 
-we didn't get this working on the first try. here's how the sword was put together, including what didn't work, so you can skip our mistakes.
+Here's the process of how to build this on your own.
 
 ### step 1: plan the pins
 
-we started by deciding which ESP32 pins to use. D21 and D22 are the ESP32's default I2C pins, which the motion sensor uses. D32, D34 and D35 were set aside for the joystick, because D34 and D35 are input-only pins that can read analog values.
+Start by deciding which ESP32 pins to use. D21 and D22 are the ESP32's default I2C pins, which the motion sensor uses. D32, D34 and D35 were set aside for the joystick, because D34 and D35 are input-only pins that can read analog values.
 
 <img src="images/step2_esp32.png" alt="ESP32 pins used" width="450">
 
@@ -65,40 +65,22 @@ the MPU6050 gets power from the rails, with SDA going to D21 and SCL to D22. bef
 
 ### step 4: first version, with wi-fi, a joystick, and a laptop script
 
-the first full version did a lot:
+the final version will allow you to:
 
-- **swing** to attack, **hold the sword sideways** to block with a shield, the **joystick** to walk with W/A/S/D, and **click the joystick** to jump.
-- the ESP32 sent text messages over wi-fi (through a phone hotspot) to `bridge/sword_bridge.py`, a python script on the laptop that pressed the keys and mouse buttons.
+- **swing** to attack, **jump** to jump in game, the **joystick** to walk with W/A/S/D, and **click the joystick** to jump.
+- the ESP32 sent text messages over wi-fi to `bridge/sword_bridge.py`, a python script on the laptop that pressed the keys and mouse buttons.
 - it used the adafruit MPU6050 library to read the sensor.
 
 <img src="images/step5_full.png" alt="full wiring with joystick" width="450">
 
-### step 5: the sensor wouldn't show up
 
-this is where we got stuck. the adafruit library kept reporting that it **couldn't find the MPU6050**, even with correct wiring. many cheap GY-521 boards use a clone or similar chip that reports a different ID than the library expects, and the library refuses to talk to it.
-
-the fix was to **skip the library** and talk to the sensor directly over I2C. we wake it up by writing to its power register, then read the raw acceleration numbers ourselves. it only takes a few lines, and it works with clone boards.
-
-### step 6: simplify to a bluetooth mouse
-
-with the clock running out, we cut the project down to what mattered most: **swing to attack**. instead of wi-fi plus a python script, the ESP32 now acts as a bluetooth mouse. that means:
-
-- no hotspot and no laptop script, just pair it like any mouse.
-- fewer things to break during a demo.
-
-the joystick, blocking and the wi-fi bridge aren't in the current sketch. the python bridge is still in `bridge/`, and the full wi-fi firmware is in the git history if you want to bring them back:
-
-```bash
-git show 33a2488:sword_wireless/sword_wireless.ino
-```
-
-### step 7: go wireless with a battery
+### step 6: go wireless with a battery
 
 to swing without a USB cable, a 9V battery clip goes into **VIN** and **GND**. VIN runs through the board's voltage regulator, so it's safe for 9V. **never** connect the battery to 3V3 or the + rail, or you'll fry the sensor and the board.
 
 <img src="images/step7_battery.png" alt="9V battery into VIN" width="450">
 
-finally, we taped the breadboard and sensor to the foam sword so the sensor moves with the blade.
+finally, tape the breadboard and sensor to the foam sword so the sensor moves with the blade.
 
 ## Tuning and troubleshooting
 
