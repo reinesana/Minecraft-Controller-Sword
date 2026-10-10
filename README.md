@@ -10,7 +10,7 @@ The sword pairs with your laptop with **Bluetooth**, so there is nothing to inst
 | --- | --- | --- |
 | Swing hard | Left click | Attack |
 
-## Equitment
+## Equipment
 
 - ESP32 dev board (30-pin, USB-C, CP2102)
 - MPU6050 (GY-521) accelerometer/gyro
